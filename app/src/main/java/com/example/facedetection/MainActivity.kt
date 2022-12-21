@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "CameraXBasic"
-        private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 
@@ -54,11 +53,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startCamera() {
-        val scope = CoroutineScope(Dispatchers.IO)
         val finder = findViewById<PreviewView>(R.id.viewFinder)
-
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
 
@@ -73,52 +69,17 @@ class MainActivity : AppCompatActivity() {
                 .setTargetResolution(Size(640, 480))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-            imageAnalysis.setAnalyzer(
-                Executors.newSingleThreadExecutor(), ImageAnalyzer()
-//                { imageProxy ->
-//                    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-//                    // insert your code here.
-//                    Log.d(TAG, "setAnalyzer。")
-//
-//                    // after done, release the ImageProxy object
-//                    imageProxy.close()
-//                }
-            )
+            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), ImageAnalyzer())
 
             try {
                 cameraProvider.unbindAll()
-                Log.d(TAG, "1。")
-
-
-                var camera =
-                    cameraProvider.bindToLifecycle(
-                        this as LifecycleOwner,
-                        cameraSelector,
-                        imageAnalysis,
-                        preview,
-                    )
-                Log.d(TAG, "2。")
+                var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, imageAnalysis, preview,)
+                Log.d(TAG, "camera set.")
 
                 preview.setSurfaceProvider(finder.createSurfaceProvider(camera.cameraInfo))
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
-                Log.d(TAG, "。")
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
-
-//    private fun setAnalyzer(executor: Executor) {
-////        return suspendCoroutine { continuation ->
-//
-//        imageAnalysis.setAnalyzer(executor, ImageAnalysis.Analyzer { imageProxy ->
-////            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-////               continuation.resume(imageProxy)
-//            imageProxy.close()
-//        })
-//
-//        imageAnalysis.clearAnalyzer()
-//       }
-}
-//}
-
+    }
