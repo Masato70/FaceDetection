@@ -2,10 +2,12 @@ package com.example.facedetection
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
+import android.widget.ImageView
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import com.google.common.util.concurrent.ListenableFuture
@@ -13,16 +15,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.vision.face.FaceDetectorOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
-import kotlinx.coroutines.launch
-import java.util.concurrent.Executor
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -53,6 +47,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startCamera() {
+
+        val imageview = findViewById<ImageView>(R.id.imageview)
+        val analyzer = ImageAnalyzer()
+        analyzer.setOnBitmapReadyListener(object : ImageAnalyzer.OnBitmapReadyListener {
+            override fun onBitmapReady(bitmap: Bitmap) {
+                imageview.setImageBitmap(bitmap)
+            }
+        })
+
         val finder = findViewById<PreviewView>(R.id.viewFinder)
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener(Runnable {
