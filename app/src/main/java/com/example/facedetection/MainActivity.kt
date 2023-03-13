@@ -26,7 +26,6 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
-    private lateinit var imageAnalysis: ImageAnalysis
 
     companion object {
         const val TAG = "CameraXBasic"
@@ -64,12 +63,12 @@ class MainActivity : AppCompatActivity() {
                 .build()
 
             val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(640, 480))
+                .setTargetResolution(Size(200, 380))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
-            val context = this
-            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), ImageAnalyzer(context = context, attrs = null))
+            Log.d(TAG, "call analyzer-log")
+            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), findViewById(R.id.ImageAnalyzer))
 
             try {
                 cameraProvider.unbindAll()
